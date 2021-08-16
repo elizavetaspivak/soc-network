@@ -1,6 +1,6 @@
 import './App.css';
 import {Navbar} from './components/Navbar/Navbar';
-import {BrowserRouter, Route, withRouter} from 'react-router-dom'
+import {BrowserRouter, HashRouter, Route, withRouter} from 'react-router-dom'
 import {News} from './components/News/News';
 import {Music} from './components/Music/Music';
 import {Settings} from './components/Settings/Settings';
@@ -60,8 +60,8 @@ let AppContainer = compose<React.ComponentType>(
 
 export let SamuraiJSApp = () => {
     return <Provider store={store}>
-        <BrowserRouter>
+        <HashRouter>
             <AppContainer/>
-        </BrowserRouter>
+        </HashRouter>
     </Provider>
 }
