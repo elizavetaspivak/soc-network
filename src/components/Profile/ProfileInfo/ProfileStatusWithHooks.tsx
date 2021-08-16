@@ -35,7 +35,7 @@ export function ProfileStatusWithHooks(props: ProfileStatusWithHooksPropsType) {
                     <input onBlur={deactivateEditMode} value={status} onChange={ChangeStatus} autoFocus/>
                 </div>
                 : <div className={s.status}>
-                    <span onDoubleClick={activateEditMode}>{props.status} </span>
+                   Status: <span onDoubleClick={activateEditMode}>{props.status} </span>
                 </div>
             }
         </div>

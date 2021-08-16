@@ -4,9 +4,9 @@ import {Profile} from './Profile';
 import {connect} from 'react-redux';
 import {AppStateType} from '../../redux/redux-store';
 import {
-    changeStatusAC, createPhotoThunkCreator,
+    changeStatusAC,
     getMeProfileThunkCreator,
-    getMeStatusThunkCreator,
+    getMeStatusThunkCreator, savePhoto, saveProfile,
     setUserProfile, updateStatusThunkCreator,
     UserProfilePage
 } from '../../redux/profileReduser';
@@ -16,6 +16,7 @@ import {withAuthRedirect} from '../../hoc/AuthRedirect';
 import {compose} from 'redux';
 import {getMeAutorizedUserID, getMeProfile, getMeStatus} from '../../redux/profilesSelectors';
 import {getIsAuth} from '../../redux/headerSelectors';
+import {UpdateProfileType} from '../../api/api';
 
 type PathParamsType = {
     userId: string | undefined
@@ -31,7 +32,8 @@ type MapDispatchToPropsType = {
     changeStatusAC: (newStatus: string) => void
     getMeStatusThunkCreator: (userId: number) => void
     updateStatusThunkCreator: (status: string) => void
-    createPhotoThunkCreator: any
+    savePhoto: (file: File) => void
+    saveProfile: (formData: UpdateProfileType) => void
 }
 type thunkPropsType = {
     getMeProfileThunkCreator: (userId: number) => void
@@ -53,8 +55,7 @@ function ProfileContainer (props: PropsType){
         }
         props.getMeProfileThunkCreator(userId)
         props.getMeStatusThunkCreator(userId)
-        props.createPhotoThunkCreator()
-    },[])
+    },[props.match.params.userId, props.autorizedUserID, props])
 
         return (
             <div>
@@ -62,7 +63,7 @@ function ProfileContainer (props: PropsType){
                     <title>Profile</title>
                     <meta name="description" content="Profile application"/>
                 </Helmet>
-                <Profile {...props} profile={props.profile} status={props.status}
+                <Profile {...props} saveProfile={props.saveProfile} savePhoto={props.savePhoto} isOwner={!props.match.params.userId} profile={props.profile} status={props.status}
                          changeStatusAC={props.changeStatusAC} updateStatus={props.updateStatusThunkCreator}/>
             </div>
         )
@@ -78,7 +79,7 @@ let mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
 export default compose<React.ComponentType>(
     connect(mapStateToProps, {
         setUserProfile, getMeProfileThunkCreator, changeStatusAC,
-        getMeStatusThunkCreator, updateStatusThunkCreator,createPhotoThunkCreator
+        getMeStatusThunkCreator, updateStatusThunkCreator, savePhoto, saveProfile
     }),
     withRouter,
     withAuthRedirect

@@ -8,13 +8,16 @@ import {
     UnfollowAT
 } from './usersReduser';
 import {PostType} from './redux-store';
-import {profileAPI} from '../api/api';
+import {profileAPI, UpdateProfileType} from '../api/api';
 import {NewMessageActionType} from './dialogsReduser';
+import {Dispatch} from 'redux';
+import {stopSubmit} from 'redux-form';
 
 export const ADD_POST = 'ADD-POST'
 export const DELETE_POST = 'DELETE-POST'
 export const SET_USER_PROFILE = 'SET_USER_PROFILE'
 export const SET_NEW_STATUS = 'SET_NEW_STATUS'
+export const SET_NEW_PHOTO = 'SET_NEW_PHOTO'
 
 let initialState = {
     posts: [
@@ -77,6 +80,16 @@ export type setNewStatusAT = {
     newStatus: string
 }
 
+export type setNewPhotoAT = {
+    type: 'SET_NEW_PHOTO'
+    photos: PhotosType
+}
+
+type PhotosType = {
+    small: string
+    large: string
+}
+
 export type ActionType =
     AddPostActionType
     | NewMessageActionType
@@ -90,6 +103,7 @@ export type ActionType =
     | ToggleIsFollowingProgressAT
     | setNewStatusAT
     | DeletePostActionType
+    | setNewPhotoAT
 
 export const profileReduser = (state: ProfilePageType = initialState, action: ActionType) => {
     switch (action.type) {
@@ -114,6 +128,11 @@ export const profileReduser = (state: ProfilePageType = initialState, action: Ac
                 ...state,
                 posts: state.posts.filter(p => p.id !== action.postId)
             }
+        case SET_NEW_PHOTO:
+            return {
+                ...state,
+                profile: {...state.profile, photos: action.photos}
+            }
         default:
             return state;
     }
@@ -131,24 +150,43 @@ export const changeStatusAC = (newStatus: string): setNewStatusAT => ({
     type: SET_NEW_STATUS, newStatus
 })
 
+export const updatePhotoAC = (photos: PhotosType): setNewPhotoAT => ({
+    type: SET_NEW_PHOTO, photos
+})
 
-export const getMeProfileThunkCreator = (userId: number) => async (dispatch: any) => {
+
+export const getMeProfileThunkCreator = (userId: number) => async (dispatch: Dispatch) => {
     let response = await profileAPI.getMeProfile(userId)
     dispatch(setUserProfile(response.data))
 }
 
-export const getMeStatusThunkCreator = (userId: number) => async (dispatch: any) => {
+export const getMeStatusThunkCreator = (userId: number) => async (dispatch: Dispatch) => {
     let response = await profileAPI.getMeStatus(userId)
     dispatch(changeStatusAC(response.data))
 }
 
-export const updateStatusThunkCreator = (status: string) => async (dispatch: any) => {
+export const updateStatusThunkCreator = (status: string) => async (dispatch: Dispatch) => {
     let response = await profileAPI.updateStatus(status)
     if (response.data.resultCode === 0) {
         dispatch(changeStatusAC(status))
     }
 }
 
-export const createPhotoThunkCreator = () => async (dispatch: any) => {
-    let response = await profileAPI.createPhoto()
+export const savePhoto = (file: File) => async (dispatch: Dispatch) => {
+    let response = await profileAPI.createPhoto(file)
+    if (response.data.resultCode === 0) {
+        dispatch(updatePhotoAC(response.data.data.photos))
+    }
+}
+
+export const saveProfile = (updatedProfile: UpdateProfileType) => async (dispatch: any, getState: any) => {
+    const userId = getState().auth.userId
+
+    let response = await profileAPI.updateProfile(updatedProfile)
+
+    if (response.data.resultCode === 0) {
+        dispatch(getMeProfileThunkCreator(userId))
+    }else {
+        dispatch(stopSubmit('login', {_error: response.data.messages[0]}))
+    }
 }
