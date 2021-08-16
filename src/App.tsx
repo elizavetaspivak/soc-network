@@ -1,6 +1,6 @@
 import './App.css';
 import {Navbar} from './components/Navbar/Navbar';
-import {BrowserRouter, Route, withRouter} from 'react-router-dom'
+import {BrowserRouter, Redirect, Route, withRouter} from 'react-router-dom'
 import {News} from './components/News/News';
 import {Music} from './components/Music/Music';
 import {Settings} from './components/Settings/Settings';
@@ -25,7 +25,7 @@ class App extends React.Component<any, any> {
 
     render() {
         if (!this.props.initialized) {
-            return <Preloader/>
+            return <Redirect to={'/login'}/>
         }
 
         return (
