@@ -7,17 +7,18 @@ import {AppStateType} from '../redux/redux-store';
 
 type mapStateToPropsType = {
     isAuth: boolean
+    captchaURL: string | null | undefined
 }
 
 type MapDispatchToPropsType = {
-    loginThunkCreator: (email: string, password: string, rememberMe: boolean) => void
+    loginThunkCreator: (email: string, password: string, rememberMe: boolean, captcha: string | null | undefined) => void
 }
 
 type LoginPropsType = mapStateToPropsType & MapDispatchToPropsType
 
 const Login: React.FC<LoginPropsType> = ({loginThunkCreator, isAuth }) => {
     const onSubmit = (formData: FormDataType) => {
-        loginThunkCreator(formData.login, formData.password, formData.rememberMe)
+        loginThunkCreator(formData.login, formData.password, formData.rememberMe, formData.captcha)
     }
 debugger
     if (isAuth){
@@ -33,6 +34,7 @@ debugger
 }
 
 const mapStateToProps = (state: AppStateType): mapStateToPropsType => ({
+    captchaURL: state.auth.captcha,
     isAuth: state.auth.isAuth
 })
 

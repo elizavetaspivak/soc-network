@@ -14,7 +14,7 @@ type ProfileInfoPropsType = {
     updateStatus: (status: string) => void
     isOwner: boolean
     savePhoto: (file: File) => void
-    saveProfile: (formData: UpdateProfileType) => void
+    saveProfile: any
 }
 
 export function ProfileInfo(props: ProfileInfoPropsType) {
@@ -27,8 +27,9 @@ export function ProfileInfo(props: ProfileInfoPropsType) {
     }
 
     const onSubmit = (formData: any) => {
-        props.saveProfile(formData)
-        setEditMode(false)
+        props.saveProfile(formData).then(() => {
+            setEditMode(false)
+        })
     }
 
     const goToEditMode = () => {

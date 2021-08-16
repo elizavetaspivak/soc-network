@@ -1,5 +1,6 @@
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Input, Textarea} from '../../common/FormsControls/FormsControl';
+import s from '../../common/FormsControls/FormsControl.module.css';
 import {Field, reduxForm} from 'redux-form';
 import {AppStateType} from '../../../redux/redux-store';
 import {UserProfilePage} from '../../../redux/profileReduser';
@@ -16,11 +17,11 @@ export const createField = (type: string, placeholder: string, name: string, com
 }
 
 function ProfileDataForm(props: any) {
-    let dispatch = useDispatch()
     const profile = useSelector<AppStateType, UserProfilePage>(state => state.profilePage.profile)
 
     return (
         <form onSubmit={props.handleSubmit}>
+            {props.error && <div className={s.formSummaryError}>{props.error}</div>}
             <div style={{listStyleType: 'none', paddingLeft: '0px', marginLeft: '0px'}}>
                 <div><b>Full name:</b>
                     {createField('textarea', 'Full  name', 'fullName', Input, [])} </div>
