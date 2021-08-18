@@ -1,7 +1,6 @@
 import React from 'react'
 import {ActionType} from './profileReduser';
 import {usersAPI} from '../api/api';
-import {futimes} from 'fs';
 import {updateObjectInArray} from '../utils/validators/object-helpers';
 
 export type FollowAT = {
@@ -75,7 +74,7 @@ export type UsersPageType = {
 
 let initialState: UsersPageType = {
     users: [],
-    pageSize: 5,
+    pageSize: 10,
     totalUsersCount: 0,
     currentPage: 1,
     isFetching: false,

@@ -1,12 +1,20 @@
 .user {
-    margin: 15px auto;
-    width: 600px;
     display: flex;
-    min-height: 100vh;
+    padding: 20px;
+    width: 600px;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
 }
 
 .allUsers{
     min-height: 100vh;
+}
+
+.allUsers{
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
 }
 
 .image {

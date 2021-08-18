@@ -1,6 +1,6 @@
 import './App.css';
 import {Navbar} from './components/Navbar/Navbar';
-import {BrowserRouter, HashRouter, Route, withRouter} from 'react-router-dom'
+import {HashRouter, Redirect, Route, withRouter} from 'react-router-dom'
 import {News} from './components/News/News';
 import {Music} from './components/Music/Music';
 import {Settings} from './components/Settings/Settings';
@@ -19,8 +19,16 @@ const DialogsContainer = React.lazy(() => import('./components/Dialogs/DialogsCo
 const ProfileContainer = React.lazy(() => import('./components/Profile/ProfileContainer'))
 
 class App extends React.Component<any, any> {
+    catchAllUnhandlesErrors = (promiseRejectionEvent: PromiseRejectionEvent) => {
+        alert(promiseRejectionEvent)
+    }
     componentDidMount() {
         this.props.initializeApp()
+        window.addEventListener('unhandledrejection', this.catchAllUnhandlesErrors)
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('unhandledrejection', this.catchAllUnhandlesErrors)
     }
 
     render() {
@@ -33,6 +41,8 @@ class App extends React.Component<any, any> {
                 <HeaderContainer/>
                 <Navbar/>
                 <div className="app-wrapper-content">
+                    <Route exact path="/"
+                           render={() => <Redirect to={'/profile'}/>}/>
                     <Route path="/dialogs"
                            render={WithSuspense(DialogsContainer)}/>
                     <Route path="/profile/:userId?"
@@ -43,6 +53,8 @@ class App extends React.Component<any, any> {
                            render={() => <UsersContainer/>}/>
                     <Route path="/settings" render={() => <Settings/>}/>
                     <Route path="/login" render={() => <Login/>}/>
+                    <Route path='/404' render={() => <div>404 NOT FOUND</div>}/>
+                    <Redirect from={'*'} to={'/404'} />
                 </div>
             </div>
         );

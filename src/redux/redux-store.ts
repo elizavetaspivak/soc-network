@@ -23,11 +23,6 @@ export let store = createStore(reducers, applyMiddleware(thunk))
 // @ts-ignore
 window.store = store
 
-export type RootStateType = {
-    profilePage: ProfilePageType
-    dialogPage: DialogPageType
-}
-
 export type DialogPageType = {
     dialogs: Array<DialogType>
     messages: Array<MessageType>

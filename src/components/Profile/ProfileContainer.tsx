@@ -55,7 +55,7 @@ function ProfileContainer (props: PropsType){
         }
         props.getMeProfileThunkCreator(userId)
         props.getMeStatusThunkCreator(userId)
-    },[props.match.params.userId, props.autorizedUserID, props])
+    },[props.match.params.userId])
 
         return (
             <div>

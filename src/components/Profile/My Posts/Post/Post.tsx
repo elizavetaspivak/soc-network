@@ -1,17 +1,21 @@
 import s from './Post.module.css'
+import userPhoto from '../../../../assets/images/avatar.jpg';
+import {useSelector} from 'react-redux';
+import {AppStateType} from '../../../../redux/redux-store';
+import {UserProfilePage} from '../../../../redux/profileReduser';
 
 type PostPropsType = {
     message: string
     likesCount: number
     id: number
+    profile: UserProfilePage
 }
 
 export function Post(props: PostPropsType) {
     return (
 
         <div className={s.item}>
-            <img
-                src='https://www.liveabout.com/thmb/pElYdfgKoydmsrso8fiU1wd-jO0=/1449x1449/smart/filters:no_upscale()/Avatar_12_HR_01-56a00ca93df78cafda9fd17c.jpg'/>
+            <img src={props.profile ? props.profile.photos.small : userPhoto} alt={''}/>
             {props.message}
             <div>
                 <span>like</span> {props.likesCount}

@@ -1,4 +1,4 @@
-import {connect, useDispatch} from 'react-redux';
+import {connect} from 'react-redux';
 import {AppStateType} from '../../redux/redux-store';
 import {
     follow, followUsersThunkCreator,

@@ -18,7 +18,7 @@ export const User: React.FC<UserPropsType> = ({
                                                   followUsersThunkCreator
                                               }) => {
     return (
-        <div className={s.allUser}>
+        <div className={s.user}>
             <div className={s.image}>
                 <NavLink to={'/profile/' + user.id}>
                     <img

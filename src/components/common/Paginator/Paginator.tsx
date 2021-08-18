@@ -1,7 +1,6 @@
 import s from './Paginator.module.css';
 import React, {useState} from 'react';
 import cn from 'classnames'
-import {inspect} from 'util';
 
 type PaginatorPropsType = {
     pageSize: number

@@ -1,18 +1,20 @@
 import React from 'react'
-import {addPostActionCreator} from '../../../redux/profileReduser';
+import {addPostActionCreator, UserProfilePage} from '../../../redux/profileReduser';
 import {MyPosts} from './MyPosts';
 import {AppStateType, PostType} from '../../../redux/redux-store';
 import {connect} from 'react-redux';
-import {getMePosts} from '../../../redux/profilesSelectors';
+import {getMePosts, getMeProfile} from '../../../redux/profilesSelectors';
 
 
 type mapStateToPropsType = {
     posts: Array<PostType>
+    profile: UserProfilePage
 }
 
 let mapStateToProps = (state: AppStateType): mapStateToPropsType => {
     return {
-        posts: getMePosts(state)
+        posts: getMePosts(state),
+        profile: getMeProfile(state)
     }
 }
 
