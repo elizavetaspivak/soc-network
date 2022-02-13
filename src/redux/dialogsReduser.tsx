@@ -4,11 +4,6 @@ import {DialogPageType} from './redux-store';
 
 export const ADD_NEW_MESSAGE = 'ADD-NEW-MESSAGE'
 
-export type NewMessageActionType = {
-    type: 'ADD-NEW-MESSAGE'
-    newMessageBody: string
-}
-
 let initialState = {
     dialogs: [
         {id: 1, name: 'Lizok'},
@@ -24,7 +19,7 @@ let initialState = {
     ]
 }
 
-export const dialogsReduser = (state: DialogPageType = initialState, action: ActionType) => {
+export const dialogsReduser = (state: DialogPageType = initialState, action: ActionType): DialogPageType => {
     switch (action.type) {
         case ADD_NEW_MESSAGE: {
             let body = action.newMessageBody;
@@ -38,7 +33,7 @@ export const dialogsReduser = (state: DialogPageType = initialState, action: Act
     }
 }
 
-export const addNewMessageActionCreator = (newMessageBody: string): NewMessageActionType => ({
+export const addNewMessageActionCreator = (newMessageBody: string) => ({
     type: ADD_NEW_MESSAGE,
     newMessageBody: newMessageBody
-})
+} as const)

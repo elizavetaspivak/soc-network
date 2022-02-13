@@ -43,7 +43,7 @@ export function ProfileInfo(props: ProfileInfoPropsType) {
         <div>
             <div className={s.description_block}>
                 <div className={s.profilePhoto}>
-                    <img src={props.profile.photos.large || userPhoto} alt={''}/>
+                    <img src={ props.profile.photos ? props.profile.photos.large : userPhoto} alt={''}/>
                     <div className={s.updatePhoto}>
                         {props.isOwner ? <input type={'file'} onChange={(e) => onMainPhotoSelected(e)}/> : ''}
                     </div>

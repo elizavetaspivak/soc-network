@@ -15,7 +15,7 @@ export function Post(props: PostPropsType) {
     return (
 
         <div className={s.item}>
-            <img src={props.profile ? props.profile.photos.small : userPhoto} alt={''}/>
+            <img src={props.profile.photos ? props.profile.photos.small : userPhoto} alt={''}/>
             {props.message}
             <div>
                 <span>like</span> {props.likesCount}

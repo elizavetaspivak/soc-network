@@ -2,15 +2,11 @@ import {authThunkCreator} from './authReduser';
 
 const SET_INITIALIZED = 'SET_INITIALIZED'
 
-type SetInitializedAT = {
-    type: 'SET_INITIALIZED'
-}
-
 type AppStateType = {
     initialized: boolean
 }
 
-type ActionType = SetInitializedAT
+type ActionType = ReturnType<typeof InitializedSuccessAC>
 
 let initialState: AppStateType = {
     initialized: false
@@ -20,7 +16,7 @@ export const appReducer = (state: AppStateType = initialState, action: ActionTyp
     const stateCopy = {...state}
 
     switch (action.type) {
-        case 'SET_INITIALIZED':
+        case SET_INITIALIZED:
             return {
                 ...stateCopy,
                 initialized: true
@@ -30,7 +26,7 @@ export const appReducer = (state: AppStateType = initialState, action: ActionTyp
     }
 }
 
-export const InitializedSuccessAC = () => ({type: SET_INITIALIZED})
+export const InitializedSuccessAC = () => ({type: SET_INITIALIZED} as const)
 
 export const initializeApp = () => (dispatch: any) => {
     let promise = dispatch(authThunkCreator())

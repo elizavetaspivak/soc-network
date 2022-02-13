@@ -1,17 +1,13 @@
 import React from 'react'
 import {
-    FollowAT,
-    SetCurrentPageAT,
-    SetTotalCountAT,
-    SetUsersAT,
-    ToggleIsFetchingAT, ToggleIsFollowingProgressAT,
-    UnfollowAT
+    follow, setCurrentPage, setTotalCount, setUsers, toggleIsFetching, toggleIsFollowingProgress, unfollow
 } from './usersReduser';
-import {PostType} from './redux-store';
+import {AppStateType, PostType} from './redux-store';
 import {profileAPI, UpdateProfileType} from '../api/api';
-import {NewMessageActionType} from './dialogsReduser';
+import {addNewMessageActionCreator} from './dialogsReduser';
 import {Dispatch} from 'redux';
 import {stopSubmit} from 'redux-form';
+import {ThunkDispatch} from "redux-thunk";
 
 export const ADD_POST = 'ADD-POST'
 export const DELETE_POST = 'DELETE-POST'
@@ -24,13 +20,13 @@ let initialState = {
         {id: 1, message: 'Hi, how are you?', likesCount: 5},
         {id: 2, message: 'It\'s my first post', likesCount: 23}
     ],
-    profile: null,
+    profile: {} as UserProfilePage,
     status: ''
 }
 
 export type ProfilePageType = {
     posts: Array<PostType>
-    profile: UserProfilePage | null
+    profile: UserProfilePage
     status: string
 }
 
@@ -60,52 +56,27 @@ type Photos = {
     large: string | undefined
 }
 
-export type AddPostActionType = {
-    type: 'ADD-POST'
-    newPostBody: string
-}
-
-export type DeletePostActionType = {
-    type: 'DELETE-POST'
-    postId: number
-}
-
-export type setUserProfileAT = {
-    type: 'SET_USER_PROFILE'
-    profile: any
-}
-
-export type setNewStatusAT = {
-    type: 'SET_NEW_STATUS'
-    newStatus: string
-}
-
-export type setNewPhotoAT = {
-    type: 'SET_NEW_PHOTO'
-    photos: PhotosType
-}
-
 type PhotosType = {
     small: string
     large: string
 }
 
 export type ActionType =
-    AddPostActionType
-    | NewMessageActionType
-    | FollowAT
-    | UnfollowAT
-    | SetUsersAT
-    | SetCurrentPageAT
-    | SetTotalCountAT
-    | ToggleIsFetchingAT
-    | setUserProfileAT
-    | ToggleIsFollowingProgressAT
-    | setNewStatusAT
-    | DeletePostActionType
-    | setNewPhotoAT
+    ReturnType<typeof addPostActionCreator>
+    | ReturnType<typeof addNewMessageActionCreator>
+    | ReturnType<typeof follow>
+    | ReturnType<typeof unfollow>
+    | ReturnType<typeof setUsers>
+    | ReturnType<typeof setCurrentPage>
+    | ReturnType<typeof setTotalCount>
+    | ReturnType<typeof toggleIsFetching>
+    | ReturnType<typeof deletePostActionCreator>
+    | ReturnType<typeof toggleIsFollowingProgress>
+    | ReturnType<typeof setUserProfile>
+    | ReturnType<typeof changeStatusAC>
+    | ReturnType<typeof updatePhotoAC>
 
-export const profileReduser = (state: ProfilePageType = initialState, action: ActionType) => {
+export const profileReduser = (state: ProfilePageType = initialState, action: ActionType): ProfilePageType => {
     switch (action.type) {
         case ADD_POST: {
             return {
@@ -139,54 +110,54 @@ export const profileReduser = (state: ProfilePageType = initialState, action: Ac
 }
 
 
-export const addPostActionCreator = (newPostBody: string): AddPostActionType => ({type: ADD_POST, newPostBody})
-export const deletePostActionCreator = (postId: number): DeletePostActionType => ({type: DELETE_POST, postId})
+export const addPostActionCreator = (newPostBody: string) => ({type: ADD_POST, newPostBody} as const)
+export const deletePostActionCreator = (postId: number) => ({type: DELETE_POST, postId} as const)
 
-export const setUserProfile = (profile: any): setUserProfileAT => ({
+export const setUserProfile = (profile: any) => ({
     type: SET_USER_PROFILE, profile
-})
+} as const)
 
-export const changeStatusAC = (newStatus: string): setNewStatusAT => ({
+export const changeStatusAC = (newStatus: string) => ({
     type: SET_NEW_STATUS, newStatus
-})
+} as const)
 
-export const updatePhotoAC = (photos: PhotosType): setNewPhotoAT => ({
+export const updatePhotoAC = (photos: PhotosType) => ({
     type: SET_NEW_PHOTO, photos
-})
+} as const)
 
 
-export const getMeProfileThunkCreator = (userId: number) => async (dispatch: Dispatch) => {
+export const getMeProfileThunkCreator = (userId: number) => async (dispatch: Dispatch<ReturnType<typeof setUserProfile>>) => {
     let response = await profileAPI.getMeProfile(userId)
     dispatch(setUserProfile(response.data))
 }
 
-export const getMeStatusThunkCreator = (userId: number) => async (dispatch: Dispatch) => {
+export const getMeStatusThunkCreator = (userId: number) => async (dispatch: Dispatch<ReturnType<typeof changeStatusAC>>) => {
     let response = await profileAPI.getMeStatus(userId)
     dispatch(changeStatusAC(response.data))
 }
 
-export const updateStatusThunkCreator = (status: string) => async (dispatch: Dispatch) => {
+export const updateStatusThunkCreator = (status: string) => async (dispatch: Dispatch<ReturnType<typeof changeStatusAC>>) => {
     let response = await profileAPI.updateStatus(status)
     if (response.data.resultCode === 0) {
         dispatch(changeStatusAC(status))
     }
 }
 
-export const savePhoto = (file: File) => async (dispatch: Dispatch) => {
+export const savePhoto = (file: File) => async (dispatch: Dispatch<ReturnType<typeof updatePhotoAC>>) => {
     let response = await profileAPI.createPhoto(file)
     if (response.data.resultCode === 0) {
         dispatch(updatePhotoAC(response.data.data.photos))
     }
 }
 
-export const saveProfile = (updatedProfile: UpdateProfileType) => async (dispatch: any, getState: any) => {
+export const saveProfile = (updatedProfile: UpdateProfileType) => async (dispatch: ThunkDispatch<ReturnType<typeof getMeProfileThunkCreator>, ReturnType<typeof stopSubmit>, any>, getState: () => AppStateType) => {
     const userId = getState().auth.userId
 
     let response = await profileAPI.updateProfile(updatedProfile)
 
     if (response.data.resultCode === 0) {
-        dispatch(getMeProfileThunkCreator(userId))
-    }else {
+        userId && dispatch(getMeProfileThunkCreator(userId))
+    } else {
         dispatch(stopSubmit('edit-profile', {_error: response.data.messages[0]}))
         return Promise.reject(response.data.messages[0])
     }

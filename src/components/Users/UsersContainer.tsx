@@ -30,23 +30,19 @@ type mapStateToPropsType = {
     followingInProgress: number[]
 }
 
-type UsersAPIComponentPropsType = {
-    users: Array<UserType>
-    pageSize: number
-    totalUsersCount: number
-    currentPage: number
+type mapDispatchToPropsType = {
     follow: (userId: number) => void
     unfollow: (userId: number) => void
     setCurrentPage: (currentPage: number) => void
-    isFetching: boolean
-    followingInProgress: number[]
     toggleIsFollowingProgress: (isFollowing: boolean, userId: number) => void
     getUsersThunkCreator: (currentPage: number, pageSize: number) => void
     unfollowUsersThunkCreator: (userId: number) => void
     followUsersThunkCreator: (userId: number) => void
 }
 
-export function UsersComponent (props: UsersAPIComponentPropsType) {
+type UsersAPIComponentPropsType = mapStateToPropsType & mapDispatchToPropsType
+
+export const UsersComponent: React.FC<UsersAPIComponentPropsType> = (props) => {
     useEffect(() => {
         props.getUsersThunkCreator(props.currentPage, props.pageSize)
     }, [])
@@ -56,16 +52,16 @@ export function UsersComponent (props: UsersAPIComponentPropsType) {
         props.getUsersThunkCreator(pageNumber, props.pageSize)
     }
 
-        return <>
-            {props.isFetching ? <Preloader/> : null}
-            <Users users={props.users} pageSize={props.pageSize} follow={props.follow}
-                   unfollow={props.unfollow} currentPage={props.currentPage}
-                   totalUsersCount={props.totalUsersCount} onPageChanged={onPageChanged}
-                   followingInProgress={props.followingInProgress}
-                   toggleIsFollowingProgress={props.toggleIsFollowingProgress}
-                   unfollowUsersThunkCreator={props.unfollowUsersThunkCreator}
-                   followUsersThunkCreator={props.followUsersThunkCreator}/>
-        </>
+    return <>
+        {props.isFetching ? <Preloader/> : null}
+        <Users users={props.users} pageSize={props.pageSize} follow={props.follow}
+               unfollow={props.unfollow} currentPage={props.currentPage}
+               totalUsersCount={props.totalUsersCount} onPageChanged={onPageChanged}
+               followingInProgress={props.followingInProgress}
+               toggleIsFollowingProgress={props.toggleIsFollowingProgress}
+               unfollowUsersThunkCreator={props.unfollowUsersThunkCreator}
+               followUsersThunkCreator={props.followUsersThunkCreator}/>
+    </>
 }
 
 let mapStateToProps = (state: AppStateType): mapStateToPropsType => {
@@ -80,7 +76,7 @@ let mapStateToProps = (state: AppStateType): mapStateToPropsType => {
 }
 
 export default compose<React.ComponentType>(
-    connect(mapStateToProps, {
+    connect<mapStateToPropsType, mapDispatchToPropsType, {}, AppStateType>(mapStateToProps, {
         follow, unfollow, setCurrentPage, toggleIsFollowingProgress, getUsersThunkCreator, unfollowUsersThunkCreator,
         followUsersThunkCreator
     })

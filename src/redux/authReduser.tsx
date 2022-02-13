@@ -1,19 +1,10 @@
 import {loginAPI, securityAPI} from '../api/api';
 import {stopSubmit} from 'redux-form';
-
+import {ThunkDispatch} from "redux-thunk";
+import {Dispatch} from "redux";
 
 const SET_USER_DATA = 'samurai-network/auth/SET_USER_DATA'
 const SET_CAPTCHA = 'samurai-network/auth/SET_CAPTCHA'
-
-type SetUserDataAT = {
-    type: 'samurai-network/auth/SET_USER_DATA'
-    data: AuthStateType
-}
-
-type SetCaptchaAT = {
-    type: 'samurai-network/auth/SET_CAPTCHA'
-    captchaURl: string
-}
 
 type AuthStateType = {
     userId: number | null
@@ -23,7 +14,7 @@ type AuthStateType = {
     captcha?: string | null | undefined
 }
 
-type ActionType = SetUserDataAT | SetCaptchaAT
+type ActionType = ReturnType<typeof SetAuthUserDataAC> | ReturnType<typeof SetCaptchaAC>
 
 let initialState: AuthStateType = {
     userId: null,
@@ -52,14 +43,14 @@ export const authReducer = (state: AuthStateType = initialState, action: ActionT
     }
 }
 
-export const SetAuthUserDataAC = (userId: number | null, email: string | null, login: string | null, isAuth: boolean): SetUserDataAT => ({
+export const SetAuthUserDataAC = (userId: number | null, email: string | null, login: string | null, isAuth: boolean) => ({
     type: SET_USER_DATA,
     data: {userId, email, login, isAuth}
-})
+} as const)
 
-export const SetCaptchaAC = (captchaURl: string): SetCaptchaAT => ({type: SET_CAPTCHA, captchaURl})
+export const SetCaptchaAC = (captchaURl: string) => ({type: SET_CAPTCHA, captchaURl} as const)
 
-export const authThunkCreator = () => async (dispatch: any) => {
+export const authThunkCreator = () => async (dispatch: Dispatch<ReturnType<typeof SetAuthUserDataAC>>) => {
     let response = await loginAPI.me()
     if (response.data.resultCode === 0) {
         let {id, login, email} = response.data.data
@@ -67,7 +58,7 @@ export const authThunkCreator = () => async (dispatch: any) => {
     }
 }
 
-export const loginThunkCreator = (email: string, password: string, rememberMe: boolean, captcha: string | null | undefined) => async (dispatch: any) => {
+export const loginThunkCreator = (email: string, password: string, rememberMe: boolean, captcha: string | null | undefined) => async (dispatch: ThunkDispatch<ReturnType<typeof authThunkCreator>, ReturnType<typeof getCaptchaThunkCreator>, ReturnType<typeof stopSubmit>>) => {
     let response = await loginAPI.login(email, password, rememberMe, captcha)
     if (response.data.resultCode === 0) {
         dispatch(authThunkCreator())
@@ -80,13 +71,13 @@ export const loginThunkCreator = (email: string, password: string, rememberMe: b
     }
 }
 
-export const getCaptchaThunkCreator = () => async (dispatch: any) => {
+export const getCaptchaThunkCreator = () => async (dispatch: Dispatch<ReturnType<typeof SetCaptchaAC>>) => {
     let response = await securityAPI.getCaptcha()
     const captchaURl = response.data.url
     dispatch(SetCaptchaAC(captchaURl))
 }
 
-export const logoutThunkCreator = () => async (dispatch: any) => {
+export const logoutThunkCreator = () => async (dispatch: Dispatch<ReturnType<typeof SetAuthUserDataAC>>) => {
     let response = await loginAPI.logout()
     if (response.data.resultCode === 0) {
         dispatch(SetAuthUserDataAC(null, null, null, false))
