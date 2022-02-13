@@ -1,5 +1,21 @@
 import axios from 'axios';
 
+export enum ResultCodes {
+    Success = 0,
+    Error = 1,
+    CaptchaIsRequired = 10
+}
+
+type MeResponseType = {
+    data: {
+        id: number
+        email:string
+        login:string
+    }
+    resultCode: number
+    messages: string
+}
+
 const instance = axios.create({
     baseURL: 'https://social-network.samuraijs.com/api/1.0/',
     withCredentials: true,
@@ -22,9 +38,9 @@ export const usersAPI = {
 
 export const loginAPI = {
     me() {
-        return instance.get(`auth/me`)
+        return instance.get<MeResponseType>(`auth/me`).then(res => res.data )
     },
-    login(email: string, password: string, rememberMe: boolean, captcha: string|null|undefined) {
+    login(email: string, password: string, rememberMe: boolean, captcha: string | null | undefined) {
         return instance.post(`auth/login`, {email, password, rememberMe, captcha})
     },
     logout() {

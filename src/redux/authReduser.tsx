@@ -1,4 +1,4 @@
-import {loginAPI, securityAPI} from '../api/api';
+import {loginAPI, ResultCodes, securityAPI} from '../api/api';
 import {stopSubmit} from 'redux-form';
 import {ThunkDispatch} from "redux-thunk";
 import {Dispatch} from "redux";
@@ -51,19 +51,19 @@ export const SetAuthUserDataAC = (userId: number | null, email: string | null, l
 export const SetCaptchaAC = (captchaURl: string) => ({type: SET_CAPTCHA, captchaURl} as const)
 
 export const authThunkCreator = () => async (dispatch: Dispatch<ReturnType<typeof SetAuthUserDataAC>>) => {
-    let response = await loginAPI.me()
-    if (response.data.resultCode === 0) {
-        let {id, login, email} = response.data.data
+    let meData = await loginAPI.me()
+    if (meData.resultCode === ResultCodes.Success) {
+        let {id, login, email} = meData.data
         dispatch(SetAuthUserDataAC(id, email, login, true))
     }
 }
 
 export const loginThunkCreator = (email: string, password: string, rememberMe: boolean, captcha: string | null | undefined) => async (dispatch: ThunkDispatch<ReturnType<typeof authThunkCreator>, ReturnType<typeof getCaptchaThunkCreator>, ReturnType<typeof stopSubmit>>) => {
     let response = await loginAPI.login(email, password, rememberMe, captcha)
-    if (response.data.resultCode === 0) {
+    if (response.data.resultCode === ResultCodes.Success) {
         dispatch(authThunkCreator())
     } else {
-        if (response.data.resultCode === 10) {
+        if (response.data.resultCode === ResultCodes.CaptchaIsRequired) {
             dispatch(getCaptchaThunkCreator())
         }
         let message = response.data.messages.length > 0 ? response.data.messages[0] : 'Some Error'
@@ -79,7 +79,7 @@ export const getCaptchaThunkCreator = () => async (dispatch: Dispatch<ReturnType
 
 export const logoutThunkCreator = () => async (dispatch: Dispatch<ReturnType<typeof SetAuthUserDataAC>>) => {
     let response = await loginAPI.logout()
-    if (response.data.resultCode === 0) {
+    if (response.data.resultCode === ResultCodes.Success) {
         dispatch(SetAuthUserDataAC(null, null, null, false))
     }
 }
