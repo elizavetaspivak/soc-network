@@ -1,10 +1,10 @@
-export const requiredField = (value: any) => {
+export const requiredField = (value: string): string | undefined => {
     if(value) return undefined
 
     return 'Field is required'
 }
 
-export const maxLengthCreator = (maxLength: number) => (value: any) => {
+export const maxLengthCreator = (maxLength: number) => (value: string): string | undefined => {
     if(value && value.length > maxLength) return `Max length is ${maxLength} symbols`
 
     return undefined
